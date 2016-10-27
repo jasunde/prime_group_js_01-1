@@ -14,8 +14,9 @@ function that takes in one employee array as argument and returns another array
 ******************************************************************************/
 function bonusArray(employee) {
   var percentBonus = bonusPercentage(employee);
-  var totalComp = parseInt(employee[2]) + (percentBonus*parseInt(employee[2]))
-  return [employee[0], (percentBonus*100) +"%", "$" + totalComp, "$" + Math.round(totalComp)];
+  var totalComp = parseInt(employee[2]) + (percentBonus*parseInt(employee[2]));
+  var roundedBonus = Math.round(parseInt(employee[2]) * percentBonus);
+  return [employee[0], (percentBonus*100) +"%", "$" + totalComp, "$" + roundedBonus];
 }
 
 /*************************
