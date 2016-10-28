@@ -31,13 +31,12 @@ function bonusArray(employee) {
   var totalComp = employee.salary + bonus;
   var localeOpts = {
     style: 'currency',
-    currency: 'USD',
-    minimumFractionDigits: 2
+    currency: 'USD'
   };
-  
+
   return [
     employee.name,
-    (percentBonus*100) +"%",
+    percentBonus.toLocaleString(false, {style: 'percent'}),
     totalComp.toLocaleString('en-US', localeOpts),
     Math.round(bonus).toLocaleString('en-US', localeOpts)
   ];
@@ -47,14 +46,7 @@ function bonusArray(employee) {
 Calculate bonus percentage
 *************************/
 function bonusPercentage(rating, id, salary) {
-  var bonusPercentage = 0;
-
-  bonusPercentage += performanceBonus(rating);
-  bonusPercentage += longevityBonus(id);
-  bonusPercentage -= salaryDeduction(salary);
-  bonusPercentage = limitBonus(bonusPercentage);
-
-  return bonusPercentage;
+  return limitBonus(performanceBonus(rating) + longevityBonus(id) - salaryDeduction(salary));
 }
 
  // Integer (0-5) -> Float
