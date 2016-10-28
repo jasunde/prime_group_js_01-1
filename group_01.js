@@ -7,52 +7,96 @@ var boo = ["Boo", "11435", "54000", 3];
 var scout = ["Scout", "6243", "74750", 5];
 var robert = ["Robert", "26835", "66000", 1];
 var mayella = ["Mayella", "89068", "35000", 2];
+
+function Person([name, id, salary, rating]) {
+  this.name = name;
+  this.id = id;
+  this.salary = parseInt(salary);
+  this.rating = rating;
+}
+
 var employees = [atticus, jem, boo, scout, robert, mayella];
+
+for (var i = 0; i < employees.length; i++) {
+  employees[i] = new Person(employees[i]);
+}
 
 /******************************************************************************
 function that takes in one employee array as argument and returns another array
 ******************************************************************************/
 function bonusArray(employee) {
-  var percentBonus = bonusPercentage(employee);
-  var totalComp = parseInt(employee[2]) + (percentBonus*parseInt(employee[2]));
-  var roundedBonus = Math.round(parseInt(employee[2]) * percentBonus);
-  return [employee[0], (percentBonus*100) +"%", "$" + totalComp, "$" + roundedBonus];
+  var percentBonus = bonusPercentage(employee.rating, employee.id, employee.salary);
+
+  var bonus = percentBonus * employee.salary;
+  var totalComp = employee.salary + bonus;
+  var localeOpts = {
+    style: 'currency',
+    currency: 'USD',
+    minimumFractionDigits: 2
+  };
+  
+  return [
+    employee.name,
+    (percentBonus*100) +"%",
+    totalComp.toLocaleString('en-US', localeOpts),
+    Math.round(bonus).toLocaleString('en-US', localeOpts)
+  ];
 }
 
 /*************************
 Calculate bonus percentage
 *************************/
-function bonusPercentage(employee) {
+function bonusPercentage(rating, id, salary) {
   var bonusPercentage = 0;
-  if (employee[3] <= 2) {
-    bonusPercentage = 0;
-  } else if (employee[3] == 3) {
-    bonusPercentage = .04
-  } else if (employee[3] == 4) {
-    bonusPercentage = .06;
-  } else if (employee[3] == 5) {
-    bonusPercentage = .1;
-  } //if employee rating meets above conditions, do that math...
 
-  if (employee[1].length == 4) {
-    bonusPercentage += .05
-  } //if employee # is 4 digits long, add 5%
+  bonusPercentage += performanceBonus(rating);
+  bonusPercentage += longevityBonus(id);
+  bonusPercentage -= salaryDeduction(salary);
+  bonusPercentage = limitBonus(bonusPercentage);
 
-  if (parseInt(employee[2]) > 65000) {
-    bonusPercentage -= .01;
-  } //if income > 65000, subtract 5%
-
-  if (bonusPercentage > .13) {
-    bonusPercentage = .13;
-  } //if bonus > 13%, change to 13%
-
-  if (bonusPercentage < 0) {
-    bonusPercentage = 0;
-  } //if bonus < 0%, change to 0%
   return bonusPercentage;
 }
 
+ // Integer (0-5) -> Float
+ // Return bonus based on performance rating as a float representation of percentage of salary
+function performanceBonus(rating) {
+  switch(rating) {
+    case 3:
+      return .04;
+    case 4:
+      return .06;
+    case 5:
+      return .1;
+    default:
+      return 0;
+  }
+}
 
+// String -> Float
+// Return bonus based on longevity of employment as a float representation of percentage of salary
+function longevityBonus(id) {
+  if (id.length == 4) {
+    return .05;
+  } else {
+    return 0;
+  }
+}
+
+// Integer -> Float
+// Return bonus decrement based on salary limit as a float representation of a percentage of salary
+function salaryDeduction(salary) {
+  if (salary > 65000) {
+    return .01;
+  } else {
+    return 0;
+  }
+}
+
+// Float -> Float
+// Return bonus percentage limited by max and min bonus
+function limitBonus(bonus) {
+  return Math.max(Math.min(bonus, .13), 0);
+}
 
 var arrayList = document.getElementById("arrayList");
 
